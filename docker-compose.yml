@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  peach-clone:
+    build: .
+    container_name: peach-clone-app
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+    volumes:
+      - ./data:/app/data
+      - ./uploads:/app/public/uploads
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/data/dev.db
+      - NEXTAUTH_URL=http://localhost
+      - NEXTAUTH_SECRET=changeme_for_production

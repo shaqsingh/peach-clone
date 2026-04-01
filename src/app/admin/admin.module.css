@@ -1,0 +1,144 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.section {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .section {
+  background: #1a1a1a;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.inviteForm {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem 1.25rem;
+  border-radius: 1rem;
+  border: 2px solid #f3f4f6;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+[data-theme="dark"] .input {
+  background: #262626;
+  border-color: #333;
+  color: white;
+}
+
+.input:focus {
+  border-color: var(--primary-color);
+}
+
+.inviteBtn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.inviteBtn:hover {
+  opacity: 0.9;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  padding: 1rem;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+[data-theme="dark"] .th {
+  color: #999;
+  border-bottom-color: #333;
+}
+
+.td {
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+[data-theme="dark"] .td {
+  border-bottom-color: #333;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badgeAdmin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badgeUser {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.deleteBtn {
+  color: #ef4444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.deleteBtn:hover {
+  text-decoration: underline;
+}
+
+.empty {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+}

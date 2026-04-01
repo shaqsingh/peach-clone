@@ -1,0 +1,46 @@
+name: peach-clone
+region: nyc
+services:
+- name: app
+  image:
+    deploy_on_push: true
+    # This assumes the user connects their GitHub repo to DigitalOcean App Platform
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 3000
+  routes:
+  - path: /
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: file:/app/data/prod.db
+  - key: NEXTAUTH_URL
+    scope: RUN_TIME
+    value: ${APP_URL}
+  - key: NEXTAUTH_SECRET
+    scope: RUN_TIME
+    type: SECRET
+  - key: EMAIL_SERVER_HOST
+    scope: RUN_TIME
+  - key: EMAIL_SERVER_PORT
+    scope: RUN_TIME
+    value: "465"
+  - key: EMAIL_SERVER_USER
+    scope: RUN_TIME
+  - key: EMAIL_SERVER_PASSWORD
+    scope: RUN_TIME
+    type: SECRET
+  - key: EMAIL_FROM
+    scope: RUN_TIME
+  # Persist uploaded images and the SQLite database
+  # Note: DO App Platform requires a "Volume" or "Space" for real persistence
+  # For Lite hosting, we suggest using a dedicated volume or switching to Postgres
+  # but we'll stick to the "Self-Contained" vibe.
+  storage:
+    volumes:
+    - name: peach-data
+      mount_path: /app/data
+      size_gib: 1
+    - name: peach-uploads
+      mount_path: /app/public/uploads
+      size_gib: 1
