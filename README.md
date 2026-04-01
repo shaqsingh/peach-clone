@@ -2,8 +2,6 @@
 
 A beautiful, self-hostable, and simple-to-use social space. Inspired by the classic mobile app, built for the modern web as a high-performance PWA.
 
-![Peach Clone Preview](https://raw.githubusercontent.com/username/peach-clone/main/public/preview.png)
-
 ## ✨ Features
 
 - **Invite-Only Registration**: Keep your instance private. The first person to sign in becomes the Admin.
