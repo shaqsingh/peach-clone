@@ -52,6 +52,20 @@ export default async function SettingsPage() {
         </div>
 
         <div className={styles.fieldGroup}>
+          <label className={styles.label}>Background Image</label>
+          <p className={styles.desc}>Sets a full-screen background image for your feed.</p>
+          {user?.bgImageUrl && (
+            <img src={user.bgImageUrl} alt="Current background" style={{ width: '100%', height: '100px', borderRadius: '12px', objectFit: 'cover', marginBottom: '0.75rem' }} />
+          )}
+          <input
+            type="file"
+            name="bgImage"
+            accept="image/*"
+            className={styles.input}
+          />
+        </div>
+
+        <div className={styles.fieldGroup}>
           <label className={styles.label}>Display Name</label>
           <input 
             type="text" 
