@@ -10,56 +10,47 @@ datasource db {
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String    @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
 model User {
-  id             String    @id @default(cuid())
-  name           String?   // Used by NextAuth primarily
-  email          String?   @unique
-  emailVerified  DateTime?
-  image          String?
-  username       String?   @unique // Made optional since magic link creates user first
-  displayName    String?
-  themePrimary   String?
-  themeSecondary String?
-  bgImageUrl     String?
-  lastActive     DateTime  @default(now())
-  showActivity   Boolean   @default(true)
-  role           String    @default("USER")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  name              String? // Used by NextAuth primarily
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  username          String?   @unique // Made optional since magic link creates user first
+  displayName       String?
+  themePrimary      String?
+  themeSecondary    String?
+  bgImageUrl        String?
+  lastActive        DateTime  @default(now())
+  showActivity      Boolean   @default(true)
+  role              String    @default("USER")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  accounts       Account[]
-  sessions       Session[]
-  posts          Post[]    @relation("UserPosts")
-  comments       Comment[]
+  accounts          Account[]
+  posts             Post[]    @relation("UserPosts")
+  comments          Comment[]
 
-  followers      Follows[] @relation("following")
-  following      Follows[] @relation("follower")
+  followers         Follows[] @relation("following")
+  following         Follows[] @relation("follower")
 }
 
 model VerificationToken {
@@ -75,24 +66,24 @@ model Follows {
   followingId String
   createdAt   DateTime @default(now())
 
-  follower    User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
-  following   User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
 
   @@id([followerId, followingId])
 }
 
 model Post {
-  id        String    @id @default(cuid())
-  content   String?   
-  type      String    // "TEXT", "IMAGE", "VIDEO"
-  mediaUrl  String?   
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  content   String?
+  type      String // "TEXT", "IMAGE", "VIDEO"
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  authorId  String
-  author    User      @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
-  
-  comments  Comment[]
+  authorId String
+  author   User  @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
 }
 
 model Comment {
@@ -101,13 +92,12 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  postId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId  String
+  post    Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
-
 
 model Invite {
   id        String   @id @default(cuid())
