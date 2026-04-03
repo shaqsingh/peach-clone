@@ -31,13 +31,14 @@ RUN adduser --system --uid 1001 nextjs
 # Install su-exec to handle non-root execution after permission fixes
 RUN apk add --no-cache su-exec
 
-COPY --from=builder /app/public ./public
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
+# Copy the standalone output first
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static/
+
+# Then copy public and static folders into the same directory as server.js
+# Next.js standalone server looks for these in the current working directory
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
 COPY --from=builder /app/prisma ./prisma/
 COPY --from=builder /app/prisma.config.js ./
 COPY docker-entrypoint.sh ./
