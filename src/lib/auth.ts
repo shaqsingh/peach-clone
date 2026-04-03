@@ -76,11 +76,20 @@ export const authOptions: NextAuthOptions = {
       // Otherwise, block access
       return "/login?error=InviteOnly";
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
-        token.username = (user as any).username;
-        token.role = (user as any).role;
+      }
+      // Always fetch fresh user data to ensure we have username/role
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.username = dbUser.username;
+          token.role = dbUser.role;
+        }
       }
       return token;
     },
