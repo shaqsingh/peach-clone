@@ -39,7 +39,7 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static/
 COPY --from=builder /app/prisma ./prisma/
-COPY --from=builder /app/prisma.config.ts ./
+COPY --from=builder /app/prisma.config.js ./
 COPY docker-entrypoint.sh ./
 
 RUN chmod +x docker-entrypoint.sh
