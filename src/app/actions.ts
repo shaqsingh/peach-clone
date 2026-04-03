@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { writeFile, unlink } from "fs/promises";
+import { writeFile, unlink, mkdir } from "fs/promises";
 import { join } from "path";
 
 export async function createPost(formData: FormData) {
@@ -24,6 +24,7 @@ export async function createPost(formData: FormData) {
     const filename = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
     
     const uploadDir = join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, filename), buffer);
     
     mediaUrl = `/uploads/${filename}`;
@@ -106,6 +107,7 @@ export async function saveSettings(formData: FormData) {
     const ext = bgImageFile.name.split('.').pop() || 'tmp';
     const filename = `bg_${Date.now()}.${ext}`;
     const uploadDir = join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, filename), buffer);
     bgImageUrl = `/uploads/${filename}`;
   }
@@ -116,6 +118,7 @@ export async function saveSettings(formData: FormData) {
     const ext = avatarFile.name.split('.').pop() || 'tmp';
     const filename = `avatar_${session.user.id}_${Date.now()}.${ext}`;
     const uploadDir = join(process.cwd(), "public", "uploads");
+    await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, filename), buffer);
     avatarUrl = `/uploads/${filename}`;
   }
