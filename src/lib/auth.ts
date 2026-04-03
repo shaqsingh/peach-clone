@@ -24,13 +24,13 @@ export const authOptions: NextAuthOptions = {
       async sendVerificationRequest(params) {
         const { identifier, url, provider } = params;
         const { host } = new URL(url);
-        
+
         // MOCK EMAIL IF NO REAL API KEY IS PRESENT
         const server = provider.server as any;
         if (server?.auth?.pass === "placeholder" || !server?.auth?.pass) {
           console.log(`\n\n=========================================`);
           console.log(`📨 MOCK EMAIL SENT TO: ${identifier}`);
-          console.log(`🔗 CLICK THIS MAGIC LINK TO LOGIN:\n   ${url}`);
+          console.log(`🔗 CLICK THIS MAGIC LINK TO LOGIN:\n ${url}`);
           console.log(`=========================================\n\n`);
           return;
         }
@@ -42,9 +42,9 @@ export const authOptions: NextAuthOptions = {
           from: provider.from,
           subject: `Sign in to ${host}`,
           text: `Sign in to ${host}\n${url}\n\n`,
-          html: `<p>Sign in to your space:</p><p><a href="${url}">Click here to sign in</a></p>`
+          html: `<p>Sign in to your space:</p><p><a href="${url}">Click here to sign in</a></p>`,
         });
-        
+
         const failed = result.rejected.concat(result.pending).filter(Boolean);
         if (failed.length) {
           throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
@@ -70,17 +70,25 @@ export const authOptions: NextAuthOptions = {
       const invite = await prisma.invite.findUnique({
         where: { email: user.email },
       });
-      
+
       if (invite) return true;
 
       // Otherwise, block access
       return "/login?error=InviteOnly";
     },
-    async session({ session, user }) {
-      if (session.user && user) {
-        session.user.id = user.id;
-        (session.user as any).username = (user as any).username;
-        (session.user as any).role = (user as any).role;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.username = (user as any).username;
+        token.role = (user as any).role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token) {
+        session.user.id = token.id as string;
+        (session.user as any).username = token.username;
+        (session.user as any).role = token.role;
       }
       return session;
     }
