@@ -24,10 +24,21 @@ export async function createPost(formData: FormData) {
     const filename = `${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
     
     const uploadDir = join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
-    await writeFile(join(uploadDir, filename), buffer);
+    console.log(`[DEBUG] process.cwd: ${process.cwd()}`);
+    console.log(`[DEBUG] Attempting to save file to: ${uploadDir}`);
+    
+    try {
+      await mkdir(uploadDir, { recursive: true });
+      console.log(`[DEBUG] Directory exists/created: ${uploadDir}`);
+      await writeFile(join(uploadDir, filename), buffer);
+      console.log(`[DEBUG] File successfully written: ${filename}`);
+    } catch (err) {
+      console.error(`[DEBUG] File write FAILED: ${err}`);
+      throw err;
+    }
     
     mediaUrl = `/uploads/${filename}`;
+    console.log(`[DEBUG] Final mediaUrl: ${mediaUrl}`);
     type = file.type.startsWith("video/") ? "VIDEO" : "IMAGE";
   }
 
@@ -107,9 +118,11 @@ export async function saveSettings(formData: FormData) {
     const ext = bgImageFile.name.split('.').pop() || 'tmp';
     const filename = `bg_${Date.now()}.${ext}`;
     const uploadDir = join(process.cwd(), "public", "uploads");
+    console.log(`📁 Background image upload to: ${uploadDir}`);
     await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, filename), buffer);
     bgImageUrl = `/uploads/${filename}`;
+    console.log(`✅ Background updated: ${bgImageUrl}`);
   }
 
   if (avatarFile && avatarFile.size > 0) {
@@ -118,9 +131,11 @@ export async function saveSettings(formData: FormData) {
     const ext = avatarFile.name.split('.').pop() || 'tmp';
     const filename = `avatar_${session.user.id}_${Date.now()}.${ext}`;
     const uploadDir = join(process.cwd(), "public", "uploads");
+    console.log(`📁 Avatar upload to: ${uploadDir}`);
     await mkdir(uploadDir, { recursive: true });
     await writeFile(join(uploadDir, filename), buffer);
     avatarUrl = `/uploads/${filename}`;
+    console.log(`✅ Avatar updated: ${avatarUrl}`);
   }
 
   await prisma.user.update({
