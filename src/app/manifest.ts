@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Peach Clone',
-    short_name: 'Peach',
+    name: 'peach!',
+    short_name: 'peach!',
     description: 'A space for you and your friends.',
     start_url: '/',
     display: 'standalone',

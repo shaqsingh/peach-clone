@@ -9,7 +9,7 @@ import type { Viewport } from "next";
 const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Peach Clone",
+  title: "peach!",
   description: "A self-hostable space for you and your friends.",
   appleWebApp: {
     capable: true,
