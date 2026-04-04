@@ -89,12 +89,15 @@ export const authOptions: NextAuthOptions = {
           token.id = dbUser.id;
           token.username = dbUser.username;
           token.role = dbUser.role;
+        } else {
+          // User was deleted - clear the token to force re-auth
+          return {} as any;
         }
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user && token) {
+      if (session.user && token && token.id) {
         session.user.id = token.id as string;
         (session.user as any).username = token.username;
         (session.user as any).role = token.role;

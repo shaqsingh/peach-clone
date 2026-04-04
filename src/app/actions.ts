@@ -160,10 +160,17 @@ export async function updateUserActivity() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return;
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { lastActive: new Date() },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { lastActive: new Date() },
+    });
+  } catch (err: any) {
+    // Silently ignore if user doesn't exist (e.g., deleted by admin)
+    if (err?.code !== 'P2025') {
+      throw err;
+    }
+  }
 }
 
 
