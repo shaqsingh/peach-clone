@@ -73,8 +73,8 @@ export const authOptions: NextAuthOptions = {
 
       if (invite) return true;
 
-      // Otherwise, block access
-      return "/login?error=InviteOnly";
+      // Otherwise, block access - throw error to signal denial
+      throw new Error("InviteOnly");
     },
     async jwt({ token, user, trigger }) {
       if (user) {

@@ -31,7 +31,11 @@ function LoginForm() {
     });
 
     if (res?.error) {
-      setError("Failed to send magic link. Make sure SMTP is configured.");
+      if (res.error === "InviteOnly" || res.error === "AccessDenied") {
+        setError("You need an invitation to join this space.");
+      } else {
+        setError("Failed to send magic link. Make sure SMTP is configured.");
+      }
       setLoading(false);
     } else {
       setSuccess(true);
