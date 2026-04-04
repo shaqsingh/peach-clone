@@ -9,7 +9,7 @@ import { toggleFollow } from "../actions";
 import ComposerForm from "./ComposerForm";
 import ScrollToBottom from "./ScrollToBottom";
 import MarkViewed from "./MarkViewed";
-import PostsList from "./PostsList";
+import FeedPosts from "./FeedPosts";
 import { formatRelativeActiveTime, isActive } from "@/lib/dateUtils";
 
 export default async function UserFeedPage({ params }: { params: Promise<{ username: string }> }) {
@@ -141,7 +141,7 @@ export default async function UserFeedPage({ params }: { params: Promise<{ usern
             <p>{isOwnFeed ? "Say something! It's your space." : "Nothing here yet."}</p>
           </div>
         ) : (
-          <PostsList
+          <FeedPosts
             posts={targetUser.posts}
             isOwnFeed={isOwnFeed}
             targetUsername={targetUser.username!}
