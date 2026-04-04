@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: 'peach!',
     description: 'A space for you and your friends.',
     start_url: '/',
-    display: 'standalone',
+    display: 'minimal-ui',
     background_color: '#ffffff',
     theme_color: '#8b5cf6',
     icons: [
