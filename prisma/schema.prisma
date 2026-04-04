@@ -10,7 +10,7 @@ datasource db {
 }
 
 model Account {
-  id                String    @id @default(cuid())
+  id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
@@ -29,28 +29,28 @@ model Account {
 }
 
 model User {
-  id                String    @id @default(cuid())
-  name              String? // Used by NextAuth primarily
-  email             String?   @unique
-  emailVerified     DateTime?
-  image             String?
-  username          String?   @unique // Made optional since magic link creates user first
-  displayName       String?
-  themePrimary      String?
-  themeSecondary    String?
-  bgImageUrl        String?
-  lastActive        DateTime  @default(now())
-  showActivity      Boolean   @default(true)
-  role              String    @default("USER")
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id            String     @id @default(cuid())
+  name          String? // Used by NextAuth primarily
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  username      String?   @unique // Made optional since magic link creates user first
+  displayName   String?
+  themePrimary  String?
+  themeSecondary String?
+  bgImageUrl    String?
+  lastActive    DateTime  @default(now())
+  showActivity  Boolean   @default(true)
+  role          String    @default("USER")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  accounts          Account[]
-  posts             Post[]    @relation("UserPosts")
-  comments          Comment[]
-
-  followers         Follows[] @relation("following")
-  following         Follows[] @relation("follower")
+  accounts  Account[]
+  posts     Post[]        @relation("UserPosts")
+  comments  Comment[]
+  followers Follows[]     @relation("following")
+  following Follows[]     @relation("follower")
+  likes     Like[]
 }
 
 model VerificationToken {
@@ -62,9 +62,10 @@ model VerificationToken {
 }
 
 model Follows {
-  followerId  String
-  followingId String
-  createdAt   DateTime @default(now())
+  followerId   String
+  followingId  String
+  createdAt    DateTime  @default(now())
+  lastViewedAt DateTime?
 
   follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
@@ -84,6 +85,20 @@ model Post {
   author   User  @relation("UserPosts", fields: [authorId], references: [id], onDelete: Cascade)
 
   comments Comment[]
+  likes    Like[]
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  postId String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
 }
 
 model Comment {
@@ -96,7 +111,7 @@ model Comment {
   post    Post @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   authorId String
-  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }
 
 model Invite {

@@ -284,6 +284,56 @@ export async function deleteInvite(inviteId: string) {
   revalidatePath("/admin");
 }
 
+export async function markFeedViewed(username: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return;
+
+  const viewedUser = await prisma.user.findUnique({
+    where: { username },
+  });
+
+  if (!viewedUser) return;
+
+  await prisma.follows.update({
+    where: {
+      followerId_followingId: {
+        followerId: session.user.id,
+        followingId: viewedUser.id,
+      },
+    },
+    data: { lastViewedAt: new Date() },
+  });
+}
+
+export async function toggleLike(postId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const existingLike = await prisma.like.findUnique({
+    where: {
+      postId_userId: {
+        postId,
+        userId: session.user.id,
+      },
+    },
+  });
+
+  if (existingLike) {
+    await prisma.like.delete({
+      where: { id: existingLike.id },
+    });
+  } else {
+    await prisma.like.create({
+      data: {
+        postId,
+        userId: session.user.id,
+      },
+    });
+  }
+
+  revalidatePath("/");
+}
+
 export async function deleteUser(userId: string) {
   const session = await getServerSession(authOptions);
   if (session?.user?.role !== "ADMIN") throw new Error("Unauthorized");

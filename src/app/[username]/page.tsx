@@ -7,8 +7,9 @@ import Link from "next/link";
 import styles from "../feed.module.css";
 import { toggleFollow } from "../actions";
 import ComposerForm from "./ComposerForm";
-import CommentModal from "./CommentModal";
 import ScrollToBottom from "./ScrollToBottom";
+import MarkViewed from "./MarkViewed";
+import PostsList from "./PostsList";
 import { formatRelativeActiveTime, isActive } from "@/lib/dateUtils";
 
 export default async function UserFeedPage({ params }: { params: Promise<{ username: string }> }) {
@@ -25,6 +26,9 @@ export default async function UserFeedPage({ params }: { params: Promise<{ usern
           comments: {
             include: { author: true },
             orderBy: { createdAt: "asc" }
+          },
+          likes: {
+            include: { user: true }
           }
         }
       },
@@ -55,21 +59,24 @@ export default async function UserFeedPage({ params }: { params: Promise<{ usern
   });
 
   const dynamicStyles = `
-    .customTheme {
-      --primary-color: ${currentUser?.themePrimary || "#8b5cf6"};
-      --secondary-color: ${currentUser?.themeSecondary || "#ede9fe"};
-      --user-secondary-color: ${currentUser?.themeSecondary || "#ede9fe"};
-      background-image: ${currentUser?.bgImageUrl ? `url('${currentUser.bgImageUrl}')` : `radial-gradient(var(--border-color) 1.5px, transparent 0)`};
-      background-size: ${currentUser?.bgImageUrl ? `cover` : `25px 25px`};
-      background-position: center;
-      background-attachment: fixed;
-      background-repeat: ${currentUser?.bgImageUrl ? `no-repeat` : `repeat`};
-    }
+  .customTheme {
+    --primary-color: ${currentUser?.themePrimary || "#8b5cf6"};
+    --secondary-color: ${currentUser?.themeSecondary || "#ede9fe"};
+    --user-secondary-color: ${currentUser?.themeSecondary || "#ede9fe"};
+    background-image: ${currentUser?.bgImageUrl ? `url('${currentUser.bgImageUrl}')` : `radial-gradient(var(--border-color) 1.5px, transparent 0)`};
+    background-size: ${currentUser?.bgImageUrl ? `cover` : `25px 25px`};
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: ${currentUser?.bgImageUrl ? `no-repeat` : `repeat`};
+  }
   `;
 
   return (
     <div className={`${styles.page} customTheme`}>
       <style>{dynamicStyles}</style>
+
+      {/* Mark this feed as viewed when not own feed */}
+      {!isOwnFeed && isFollowing && <MarkViewed username={username} />}
 
       <header className={styles.header}>
         <div className={styles.headerTitle}>
@@ -106,16 +113,16 @@ export default async function UserFeedPage({ params }: { params: Promise<{ usern
             <Link href="/settings" className={styles.followButton}>
               Settings
             </Link>
-          ) : (
+          ) : !isFollowing ? (
             <form action={async () => {
               "use server";
               await toggleFollow(targetUser.username!);
             }}>
-              <button className={`${styles.followButton} ${isFollowing ? styles.followButtonOutline : ""}`}>
-                {isFollowing ? "Following" : "Follow"}
+              <button className={styles.followButton}>
+                Follow
               </button>
             </form>
-          )}
+          ) : null}
         </div>
       </header>
 
@@ -134,63 +141,13 @@ export default async function UserFeedPage({ params }: { params: Promise<{ usern
             <p>{isOwnFeed ? "Say something! It's your space." : "Nothing here yet."}</p>
           </div>
         ) : (
-          (() => {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            const formatDateLabel = (d: Date) => {
-              const day = new Date(d);
-              day.setHours(0, 0, 0, 0);
-              if (day.getTime() === today.getTime()) return 'Today';
-              if (day.getTime() === yesterday.getTime()) return 'Yesterday';
-              return d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-            };
-
-            let lastDateLabel = '';
-            return targetUser.posts.map((post) => {
-              const dateLabel = formatDateLabel(post.createdAt);
-              const showDivider = dateLabel !== lastDateLabel;
-              lastDateLabel = dateLabel;
-              return (
-                <React.Fragment key={post.id}>
-                  {showDivider && (
-                    <div className={styles.dateDivider}>
-                      <span className={styles.dateDividerLabel}>{dateLabel}</span>
-                    </div>
-                  )}
-                  <div className={`${styles.postRow} ${!isOwnFeed ? styles.postRowLeft : ''}`}>
-                    <div className={`${styles.postBubble} ${!isOwnFeed ? styles.postBubbleLeft : ''}`}>
-                      {post.content && <div style={{ marginBottom: post.mediaUrl ? '0.5rem' : '0' }}>{post.content}</div>}
-                      {post.mediaUrl && (
-                        post.type === "IMAGE" ?
-                          <img src={post.mediaUrl} alt="Post media" style={{ maxWidth: '100%', borderRadius: '8px', display: 'block' }} />
-                          :
-                          <video src={post.mediaUrl} controls style={{ maxWidth: '100%', borderRadius: '8px' }} />
-                      )}
-                      <span className={styles.timestamp}>
-                        {post.createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-
-                      {isOwnFeed && (
-                        <form action={async () => {
-                          "use server";
-                          const { deletePost } = await import("../actions");
-                          await deletePost(post.id);
-                        }} style={{ margin: 0 }}>
-                          <button type="submit" className={styles.deletePostBtn} title="Delete post">❌</button>
-                        </form>
-                      )}
-                    </div>
-                    <div className={styles.postActionsContainer}>
-                      <CommentModal post={post} targetUsername={targetUser.username!} canComment={isOwnFeed || isFollowing} />
-                    </div>
-                  </div>
-                </React.Fragment>
-              );
-            });
-          })()
+          <PostsList
+            posts={targetUser.posts}
+            isOwnFeed={isOwnFeed}
+            targetUsername={targetUser.username!}
+            canComment={isOwnFeed || isFollowing}
+            currentUserId={session.user.id}
+          />
         )}
       </main>
 
