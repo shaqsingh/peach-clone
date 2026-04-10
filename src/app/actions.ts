@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { writeFile, unlink, mkdir } from "fs/promises";
 import { join } from "path";
+import { extractFirstUrl, fetchMetadata } from "@/lib/metadata";
 
 export async function createPost(formData: FormData) {
   const session = await getServerSession(authOptions);
@@ -42,7 +43,11 @@ export async function createPost(formData: FormData) {
     type = file.type.startsWith("video/") ? "VIDEO" : "IMAGE";
   }
 
-  if ((!content || content.trim() === "") && !mediaUrl) return;
+  const url = extractFirstUrl(content);
+  let linkData = null;
+  if (url) {
+    linkData = await fetchMetadata(url);
+  }
 
   await prisma.post.create({
     data: {
@@ -50,6 +55,10 @@ export async function createPost(formData: FormData) {
       type,
       mediaUrl,
       authorId: session.user.id,
+      linkUrl: linkData?.url || url || null,
+      linkTitle: linkData?.title || null,
+      linkDescription: linkData?.description || null,
+      linkImage: linkData?.image || null,
     },
   });
 

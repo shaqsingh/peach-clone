@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "../feed.module.css";
 import { toggleLike, deletePost } from "../actions";
 import CommentModal from "./CommentModal";
+import Linkify from "@/components/Linkify";
+import LinkPreview from "@/components/LinkPreview";
 
 const POSTS_PER_PAGE = 25;
 
@@ -57,8 +59,20 @@ const FeedPosts = ({ posts, isOwnFeed, targetUsername, canComment, currentUserId
             {showDivider && (<div className={styles.dateDivider}><span className={styles.dateDividerLabel}>{dateLabel}</span></div>)}
             <div className={styles.postRow + " " + (!isOwnFeed ? styles.postRowLeft : "")}>
               <div className={styles.postBubble + " " + (!isOwnFeed ? styles.postBubbleLeft : "")}>
-                {post.content && <div style={{ marginBottom: post.mediaUrl ? "0.5rem" : "0" }}>{post.content}</div>}
-                {post.mediaUrl && (post.type === "IMAGE" ? <img src={post.mediaUrl} alt="Post media" style={{ maxWidth: "100%", borderRadius: "8px", display: "block" }} /> : <video src={post.mediaUrl} controls style={{ maxWidth: "100%", borderRadius: "8px" }} />)}
+                {post.content && (
+                  <div style={{ marginBottom: post.mediaUrl || post.linkUrl ? "0.85rem" : "0", wordBreak: "break-word" }}>
+                    <Linkify text={post.content} />
+                  </div>
+                )}
+                {post.linkUrl && (
+                  <LinkPreview 
+                    url={post.linkUrl} 
+                    title={post.linkTitle} 
+                    description={post.linkDescription} 
+                    image={post.linkImage} 
+                  />
+                )}
+                {post.mediaUrl && (post.type === "IMAGE" ? <img src={post.mediaUrl} alt="Post media" style={{ maxWidth: "100%", borderRadius: "12px", display: "block", marginTop: "0.5rem" }} /> : <video src={post.mediaUrl} controls style={{ maxWidth: "100%", borderRadius: "12px", marginTop: "0.5rem" }} />)}
                 <span className={styles.timestamp}>{new Date(post.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                 {isOwnFeed && (<form action={deletePost.bind(null, post.id)} style={{ margin: 0 }}><button type="submit" className={styles.deletePostBtn} title="Delete post">❌</button></form>)}
               </div>
