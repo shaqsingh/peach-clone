@@ -26,16 +26,15 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN adduser --system --uid 1001 nextjs -G nodejs -h /home/nextjs -m
 
-# Install su-exec to handle non-root execution after permission fixes
-RUN apk add --no-cache su-exec
+# Install su-exec and openssl (required by Prisma engine)
+RUN apk add --no-cache su-exec openssl
 
 # Copy the standalone output first
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 
 # Then copy public and static folders into the same directory as server.js
-# Next.js standalone server looks for these in the current working directory
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
@@ -49,6 +48,6 @@ RUN mkdir -p /app/public/uploads && chown nextjs:nodejs /app/public/uploads
 
 EXPOSE 3000
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+ENV HOSTNAME=0.0.0.0
 
 ENTRYPOINT ["./docker-entrypoint.sh"]
