@@ -1,0 +1,16 @@
+# Replace yourdomain.com with your actual domain
+# Caddy will automatically handle SSL certificate generation!
+
+yourdomain.com {
+    reverse_proxy app:3000
+    
+    # Optional: Increase body limit for image uploads
+    request_body {
+        max_size 50mb
+    }
+
+    # Better logging
+    log {
+        output file /data/access.log
+    }
+}

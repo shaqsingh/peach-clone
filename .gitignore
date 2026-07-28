@@ -49,3 +49,8 @@ dev.db-journal
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# docker compose host volumes
+/data/
+/uploads/
+
